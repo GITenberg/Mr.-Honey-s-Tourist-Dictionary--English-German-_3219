@@ -1,0 +1,61 @@
+sudo: required
+dist: trusty
+language: ruby
+
+before_install:
+before_install:
+- gem install asciidoctor -v 1.5.2
+- gem install tilt
+- sudo pip install git+https://github.com/gitenberg-dev/gitberg
+- sudo pip install pillow
+- sudo pip install cssutils
+- sudo pip install docutils
+- sudo pip install roman
+- sudo pip install git+https://github.com/gitenberg-dev/pg-epubmaker
+script:
+- VERSION=`ruby -e "require 'yaml'; meta = YAML.load_file('metadata.yaml'); puts meta['_version'];"`
+- git clone https://github.com/gitenberg-dev/asciidoctor-htmlbook.git
+- sudo pip install -r asciidoctor-htmlbook/gitberg-machine/requirements.txt
+
+- /usr/bin/python -c "from gitenberg import travis; travis.build_epub()"
+- ebook-convert book.epub book.mobi
+- xvfb-run ebook-convert book.epub book.pdf
+branches:
+  only:
+  - master
+notifications:
+  webhooks:
+    urls:
+      - https://unglue.it/api/travisci/webhook
+    on_success: always
+    on_failure: never
+    on_start: never
+deploy:
+  skip_cleanup: true
+  provider: releases
+  api_key:
+    secure: bgkpenSbfqtKXT8QxK54skahioW3sUiCquCEHC7iKIskURFekQbt2VIbcBQjQDjD3ctKVA7n/f7QcqsD2HXyJgLRGzxPhyj8OQHCCehaPVzaTcULGMToQOL9FEZI/b23sHl5JLQ9FUu7qOJmYGdi8Cs2FG6QIjLLIkCNVlYxsfDmtuXT9KdmNIMcwBYbepe981YKrmVffvliWSk63pMKS760O/FJYbxKg2aVl2RscNJJw59TZobDs0dwKGkHkEWqr+YJrxMIHN7EJbi1L8h4vLbq7+q0ZwP8ESKoecQFdYsRmnOfIzt67hELii3+av8eMN6x6k3zh693fGYu1TSEqkuaoe5rDAwOMTS3yAr3xFfI20Fheu4gmiHK4k1F5oO5Nr988bsKUI4PB5dDmKbAeMn8HXmlB/Sp98aJ18FcUWHicvuQgy1beHjK2wYpCw4bMNlI5mGM7uGmGa9ZItN5cRwSt9+rIFHqvd6ZkLkk0RZbs2BSnL++d9DIMtFiO2inJydpCEC24SyBT+8QpEGy/JIwgAAMrRZfLGT0tZGInfGYDvGqqdoi5p+FWHB4Glf6ebKQzxve1dQZOJ8dd2Ue6am+RfK9q6bI574bhjv+IZV1vO93idn0ns7WjtC+JrgspcbSEovN+X0Rc+hoMY/uF6M0e4E4HgkZyR72R/IrXU0=
+  file:
+    - book.epub
+    - book.mobi
+    - book.pdf
+  "on":
+    repo: GITenberg/Mr.-Honey-s-Tourist-Dictionary--English-German-_3219
+addons:
+  apt:
+    packages:
+    - xsltproc
+    - xvfb
+    - calibre
+    - python-pip
+    - git
+    - python-dev
+    - libjpeg-dev
+    - libpng-dev
+    - libfreetype6
+    - libfreetype6-dev
+    - zlib1g-dev
+    - python-lxml
+    - libxml2-dev
+    - libxslt1-dev
+    - tidy
